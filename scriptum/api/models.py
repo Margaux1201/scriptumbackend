@@ -49,7 +49,7 @@ class Book(models.Model):
     description = models.TextField()
     public_type = models.CharField(max_length=20, choices=PUBLIC_CHOICES) # Type de public avec la variable PUBLIC_CHOICES
     genres = models.ManyToManyField(Genre, related_name='books')
-    themes = models.ManyToManyField(Theme, related_names='books')
+    themes = models.ManyToManyField(Theme, related_name='books')
     image = models.ImageField(upload_to='book_images/')
     state = models.CharField(max_length=20, default='En cours')
     is_saga = models.BooleanField(default=False)
@@ -114,7 +114,7 @@ class Chapter(models.Model):
         ('epilogue', 'Epilogue'),
     ]
 
-    book = models.ForeignKey(Book, related_names='chapters', on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, related_name='chapters', on_delete=models.CASCADE)
     title = models.CharField(max_length=50, blank=True, null=True)
     content = models.TextField()
     type = models.CharField(max_length=10, choices=TYPE_CHOICES) # Type de chapitre avec la variable TYPE_CHOICES
