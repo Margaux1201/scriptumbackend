@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import User
 
+# Serializer pour créer un utilisateur dans Postgre
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -22,3 +23,9 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
+    
+# Serializer pour la connexion d'un utilisateur
+class LoginSerializer(serializers.Serializer):
+    # pas de ModelSerializer car on n'enregistre rien dans la BDD => valide seulement les données de connexion
+    pseudo = serializers.CharField()
+    password = serializers.CharField(write_only=True)
