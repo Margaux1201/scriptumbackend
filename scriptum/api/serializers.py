@@ -11,6 +11,13 @@ class UserSerializer(serializers.ModelSerializer):
             'token': {'read_only': True},
         }
     
+    pseudo = serializers.CharField(required=True, allow_blank=False)
+    first_name = serializers.CharField(required=True, allow_blank=False)
+    last_name = serializers.CharField(required=True, allow_blank=False)
+    email = serializers.EmailField(required=True, allow_blank=False)
+    birth_date = serializers.DateField(required=True, allow_null=False)
+    password = serializers.CharField(write_only=True, required=True, allow_blank=False)
+
     def create(self, validated_data):
         user = User(
             pseudo=validated_data['pseudo'],
