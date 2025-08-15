@@ -37,7 +37,7 @@ class Theme(models.Model):
 class Book(models.Model):
     # Variable pour les choix du type de public
     PUBLIC_CHOICES = [
-        ('jeunesse', 'Jeunesse'),
+        ('tout_public', 'Tout Public'),
         ('young_adult', 'Young Adult'),
         ('adulte', 'Adulte'),
     ]
@@ -50,12 +50,13 @@ class Book(models.Model):
     public_type = models.CharField(max_length=20, choices=PUBLIC_CHOICES) # Type de public avec la variable PUBLIC_CHOICES
     genres = models.ManyToManyField(Genre, related_name='books')
     themes = models.ManyToManyField(Theme, related_name='books')
-    image = models.ImageField(upload_to='book_images/')
+    image = models.ImageField(upload_to='books/')
     state = models.CharField(max_length=20, default='En cours')
     is_saga = models.BooleanField(default=False)
     tome_name = models.CharField(max_length=30, null=True, blank=True)
     tome_number = models.IntegerField(null=True, blank=True)
     rating = models.FloatField(default=0.0)
+    warnings = models.JSONField(null=True, blank=True)
 
     class Meta:
         ordering = ['release_date', '-rating', 'title']

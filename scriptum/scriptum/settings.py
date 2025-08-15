@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,6 +28,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Dossier où seront stockés les fichiers uploadés
+# MEDIA_URL = '/media/'  # URL publique pour accéder aux fichiers
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Chemin local de stockage
+
+# Utiliser Cloudinary comme stockage par défaut pour les médias
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Application definition
 
@@ -40,6 +47,8 @@ INSTALLED_APPS = [
     'api',
     'rest_framework',
     'corsheaders'
+    'cloudinary',
+    'cloudinary_storage',
 ]
 
 MIDDLEWARE = [
@@ -87,6 +96,13 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '5432',      
     }
+}
+
+# Cloudinary config
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'Cloud_Scriptum',
+    'API_KEY': '923716599433769',
+    'API_SECRET': 'rLlxlTze8kFgPsipgPso2Eg4EeA',
 }
 
 

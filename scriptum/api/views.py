@@ -1,9 +1,12 @@
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import User
+from rest_framework.parsers import MultiPartParser
+from .models import User, Book
 from .utils import require_token
-from .serializers import UserSerializer, LoginSerializer
+from .serializers import UserSerializer, LoginSerializer, BookSerializer
+
+# PARTIE UTILISATEUR
 
 # POST register/ pour inscrire un utilisateur
 class UserCreateView(generics.CreateAPIView):
@@ -63,3 +66,32 @@ class UserUpdateView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+
+# PARTIE ROMAN
+
+# POST createbook/ pour créer un nouveau roman
+class BookCreateView(APIView):
+    parser_classes = [MultiPartParser]
+
+    @require_token
+    def post(self, request):
+        serializer = BookSerializer(data=request.data, context={'request': request})
+
+        if serializer.is_valid():
+            serializer.save(author=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+# POST getbookinfo/ pour récupérer les données d'un livre
+class BookRetrieveView(APIView):
+    @require_token
+    def get(self, request, slug):
+        try:
+            book = Book.objects.get(slug=slug)
+        except Book.DoesNotExist:
+            return Response({'error': 'Livre non trouvé'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = BookSerializer(book, context={'request': request})
+        return Response(serializer.data)
