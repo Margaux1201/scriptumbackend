@@ -5,7 +5,7 @@ from rest_framework.parsers import MultiPartParser
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import User, Book
 from .utils import require_token
-from .serializers import UserSerializer, LoginSerializer, BookSerializer
+from .serializers import UserSerializer, LoginSerializer, BookSerializer, BookReadSerializer
 from .pagination import BookPagination
 from .filters import BookFilter
 
@@ -83,10 +83,11 @@ class BookCreateView(APIView):
         serializer = BookSerializer(data=request.data, context={'request': request})
 
         if serializer.is_valid():
-            serializer.save(author=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            book = serializer.save()  # pas besoin de passer author, il est déjà dans create()
+            return Response(BookReadSerializer(book).data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
     
 # POST getbookinfo/ pour récupérer les données d'un livre
 class BookRetrieveView(APIView):
@@ -97,7 +98,7 @@ class BookRetrieveView(APIView):
         except Book.DoesNotExist:
             return Response({'error': 'Livre non trouvé'}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = BookSerializer(book, context={'request': request})
+        serializer = BookReadSerializer(book, context={'request': request})
         return Response(serializer.data)
 
 # GET getallbook/ pour récupérer tous les livres

@@ -43,44 +43,56 @@ class LoginSerializer(serializers.Serializer):
 # Serializer pour la création d'un livre dans Postgre
 class BookSerializer(serializers.ModelSerializer):
     # Définit le typage des données en request
-    genres = serializers.CharField(required=True)
-    themes = serializers.CharField(required=False, allow_blank=True)
-    warnings = serializers.CharField(required=False, allow_blank=True)
+    genres = serializers.ListField(child=serializers.CharField())
+    themes = serializers.ListField(child=serializers.CharField(), required=False)
+    warnings = serializers.JSONField(required=False)
+    is_saga = serializers.BooleanField()
 
     class Meta:
         model = Book
-        fields = ['token', 'title', 'description', 'public_type', 'genres', 'themes', 'image', 'state', 'is_saga', 'tome_name', 'tome_number', 'rating', 'warnings']
-        read_only_fields = ['rating']
+        fields = "__all__"
+        read_only_fields = ["author", "slug", "release_date", "rating"]
 
+    def to_internal_value(self, data):
+        # Convertir is_saga en booléen si besoin
+        if "is_saga" in data:
+            value = data["is_saga"]
+            if isinstance(value, str):
+                data["is_saga"] = value.lower() in ["true", "1", "yes"]
+        return super().to_internal_value(data)
 
     # Fonction pour créer le roman à a partir du token
     def create(self, validated_data):
         user = self.context['request'].user
-        
-        # Conversion des M2M et JSON + mise à l'écart de ces données
-        genres_data = json.loads(validated_data.pop('genres'))
-        themes_data = []
-        if 'themes' in validated_data and validated_data['themes']:
-            themes_data = json.loads(validated_data.pop('themes'))
-        warnings_data = None
-        if 'warnings' in validated_data and validated_data['warnings']:
-            warnings_data = json.loads(validated_data.pop('warnings'))
+        validated_data['author'] = user
+       
+        # Récupération et suppression des listes de genres / thèmes
+        genre_names = validated_data.pop('genres', [])
+        theme_names = validated_data.pop('themes', [])
+
+        # Récupérer warnings
+        warnings_data = self.initial_data.get("warnings")
+        if warnings_data:
+            validated_data['warnings'] = json.loads(warnings_data)
 
         # Création du livre
-        book = Book.objects.create(
-            author=user,
-            warnings=warnings_data,
-            **validated_data
-            )
+        book = Book.objects.create(**validated_data)
 
-        # Ajout des données mise à l'écart en M2M
-        genre_objs = [Genre.objects.get_or_create(name=name)[0] for name in genres_data]
-        book.genres.set(genre_objs)
+        # Associer ou créer automatiquement
+        genres = [Genre.objects.get_or_create(name=name)[0] for name in genre_names]
+        themes = [Theme.objects.get_or_create(name=name)[0] for name in theme_names]
 
-        if themes_data:
-            theme_objs = [Theme.objects.get_or_create(name=name)[0] for name in themes_data]
-            book.themes.set(theme_objs)
+        book.genres.set(genres)
+        book.themes.set(themes)
 
         book.update_rating()
 
         return book
+    
+class BookReadSerializer(serializers.ModelSerializer):
+    genres = serializers.SlugRelatedField(many=True, read_only=True, slug_field='name')
+    themes = serializers.SlugRelatedField(many=True, read_only=True, slug_field='name')
+
+    class Meta:
+        model = Book
+        fields = "__all__"

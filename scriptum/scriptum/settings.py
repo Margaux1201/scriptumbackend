@@ -32,11 +32,7 @@ ALLOWED_HOSTS = []
 # MEDIA_URL = '/media/'  # URL publique pour accéder aux fichiers
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Chemin local de stockage
 
-# Utiliser Cloudinary comme stockage par défaut pour les médias
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -47,9 +43,16 @@ INSTALLED_APPS = [
     'api',
     'rest_framework',
     'corsheaders'
+]
+
+# Pour Cloudinary
+INSTALLED_APPS += [
     'cloudinary',
     'cloudinary_storage',
 ]
+
+# Utiliser Cloudinary comme stockage par défaut pour les médias
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

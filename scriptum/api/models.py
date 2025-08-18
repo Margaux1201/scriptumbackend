@@ -27,11 +27,11 @@ class User(models.Model):
 
 # Modèle pour stocker les genres d'un livre
 class Genre(models.Model):
-    name = models.CharField(max_length=30, unique=True)
+    name = models.CharField(max_length=100, unique=True)
 
 # Modèle pour stocker les thèmes d'un livre
 class Theme(models.Model):
-    name = models.CharField(max_length=30, unique=True)
+    name = models.CharField(max_length=100, unique=True)
 
 # Modèle pour créer la table livre
 class Book(models.Model):
@@ -42,12 +42,12 @@ class Book(models.Model):
         ('adulte', 'Adulte'),
     ]
 
-    title = models.CharField(max_length=50)
+    title = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
     release_date = models.DateField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='books')
     description = models.TextField()
-    public_type = models.CharField(max_length=20, choices=PUBLIC_CHOICES) # Type de public avec la variable PUBLIC_CHOICES
+    public_type = models.CharField(max_length=30, choices=PUBLIC_CHOICES) # Type de public avec la variable PUBLIC_CHOICES
     genres = models.ManyToManyField(Genre, related_name='books')
     themes = models.ManyToManyField(Theme, related_name='books')
     image = models.ImageField(upload_to='books/')
