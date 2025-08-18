@@ -73,7 +73,7 @@ class BookSerializer(serializers.ModelSerializer):
             **validated_data
             )
 
-        # Ajout des données mise à l'écart en M2M et JSON
+        # Ajout des données mise à l'écart en M2M
         genre_objs = [Genre.objects.get_or_create(name=name)[0] for name in genres_data]
         book.genres.set(genre_objs)
 

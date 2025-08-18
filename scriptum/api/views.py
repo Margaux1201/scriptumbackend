@@ -1,10 +1,14 @@
-from rest_framework import generics, status
+from rest_framework import generics, status, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
+from django_filters.rest_framework import DjangoFilterBackend
 from .models import User, Book
 from .utils import require_token
 from .serializers import UserSerializer, LoginSerializer, BookSerializer
+from .pagination import BookPagination
+from .filters import BookFilter
+
 
 # PARTIE UTILISATEUR
 
@@ -95,3 +99,20 @@ class BookRetrieveView(APIView):
 
         serializer = BookSerializer(book, context={'request': request})
         return Response(serializer.data)
+
+# GET getallbook/ pour récupérer tous les livres
+class BookListAllView(generics.ListAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    pagination_class = BookPagination
+
+    # Ajout des filtres de recherche
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_class = BookFilter
+
+    # Recherche textuelle
+    search_fields = ["title", "description", "author__author_name"]
+
+    # Tri
+    ordering_fields = ["title", "release_date", "rating"]
+    ordering = ["release_date"] #ordre par défaut
