@@ -89,9 +89,8 @@ class BookCreateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     
-# POST getbookinfo/ pour récupérer les données d'un livre
+# GET getbookinfo/ pour récupérer les données d'un livre
 class BookRetrieveView(APIView):
-    @require_token
     def get(self, request, slug):
         try:
             book = Book.objects.get(slug=slug)

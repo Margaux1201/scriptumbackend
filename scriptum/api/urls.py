@@ -10,6 +10,6 @@ urlpatterns = [
     path('updateinfo/', UserUpdateView.as_view(), name='user-updateinfo'),
     # PARTIE BOOK
     path('createbook/', BookCreateView.as_view(), name='book-create'),
-    path('getbookinfo/', BookRetrieveView.as_view(), name='book-getinfo'),
+    path('getbookinfo/<slug:slug>/', BookRetrieveView.as_view(), name='book-getinfo'),
     path('getallbook/', BookListAllView.as_view(), name='book-getall')
 ]
