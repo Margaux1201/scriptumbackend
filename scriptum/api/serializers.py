@@ -66,11 +66,11 @@ class BookSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         validated_data['author'] = user
        
-        # Récupération et suppression des listes de genres / thèmes
+        # Extraction des listes de genres / thèmes
         genre_names = validated_data.pop('genres', [])
         theme_names = validated_data.pop('themes', [])
 
-        # Récupérer warnings
+        # Extraire warnings
         warnings_data = self.initial_data.get("warnings")
         if warnings_data:
             validated_data['warnings'] = json.loads(warnings_data)
@@ -91,6 +91,33 @@ class BookSerializer(serializers.ModelSerializer):
         book.update_rating()
 
         return book
+    
+    def update(self, instance, validated_data):
+        # Extraction des listes de genres / thèmes
+        genre_names = validated_data.pop('genres', [])
+        theme_names = validated_data.pop('themes', [])
+
+        # Extraire warnings
+        warnings_data = self.initial_data.get("warnings")
+        if warnings_data:
+            validated_data['warnings'] = json.loads(warnings_data)
+
+
+        # Mettre à jour les champs simples
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+
+        # Associer ou créer automatiquement
+        genres = [Genre.objects.get_or_create(name=name)[0] for name in genre_names]
+        themes = [Theme.objects.get_or_create(name=name)[0] for name in theme_names]
+
+        instance.genres.set(genres)
+        instance.themes.set(themes)
+
+        return instance
+
     
 class BookReadSerializer(serializers.ModelSerializer):
     genres = serializers.SlugRelatedField(many=True, read_only=True, slug_field='name')

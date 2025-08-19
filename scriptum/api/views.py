@@ -1,7 +1,7 @@
 from rest_framework import generics, status, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import MultiPartParser, JSONParser
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import User, Book
 from .utils import require_token
@@ -103,7 +103,7 @@ class BookRetrieveView(APIView):
 # GET getallbook/ pour récupérer tous les livres
 class BookListAllView(generics.ListAPIView):
     queryset = Book.objects.all()
-    serializer_class = BookSerializer
+    serializer_class = BookReadSerializer
     pagination_class = BookPagination
 
     # Ajout des filtres de recherche
@@ -116,3 +116,22 @@ class BookListAllView(generics.ListAPIView):
     # Tri
     ordering_fields = ["title", "release_date", "rating"]
     ordering = ["release_date"] #ordre par défaut
+
+# PUT editbook/ pour modifier des éléments du livre
+class BookUpdateView(APIView):
+    parser_classes = [MultiPartParser, JSONParser]
+
+    @require_token
+    def patch(self, request,slug):
+        try:
+            book = Book.objects.get(slug=slug)
+        except Book.DoesNotExist:
+            return Response({'error': 'Livre non trouvé'}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = BookSerializer(book, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(BookReadSerializer(book).data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
