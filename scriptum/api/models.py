@@ -4,7 +4,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
 from django.utils.text import slugify
-
+from cloudinary_storage.storage import MediaCloudinaryStorage
 
 # Modèle pour créer la table utilisateur
 class User(models.Model):
@@ -50,7 +50,7 @@ class Book(models.Model):
     public_type = models.CharField(max_length=30, choices=PUBLIC_CHOICES) # Type de public avec la variable PUBLIC_CHOICES
     genres = models.ManyToManyField(Genre, related_name='books')
     themes = models.ManyToManyField(Theme, related_name='books')
-    image = models.ImageField(upload_to='books/')
+    image = models.ImageField(storage=MediaCloudinaryStorage(), upload_to='books/')
     state = models.CharField(max_length=20, default='En cours')
     is_saga = models.BooleanField(default=False)
     tome_name = models.CharField(max_length=30, null=True, blank=True)

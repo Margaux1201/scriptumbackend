@@ -114,7 +114,7 @@ REST_FRAMEWORK = {
 
 # Cloudinary config
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'Cloud_Scriptum',
+    'CLOUD_NAME': 'dc2evzzlq',
     'API_KEY': '923716599433769',
     'API_SECRET': 'rLlxlTze8kFgPsipgPso2Eg4EeA',
 }

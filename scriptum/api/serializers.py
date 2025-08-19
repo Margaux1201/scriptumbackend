@@ -75,8 +75,11 @@ class BookSerializer(serializers.ModelSerializer):
         if warnings_data:
             validated_data['warnings'] = json.loads(warnings_data)
 
+
         # Création du livre
-        book = Book.objects.create(**validated_data)
+        book = Book(**validated_data)
+        print("image:", validated_data['image'])
+        book.save()
 
         # Associer ou créer automatiquement
         genres = [Genre.objects.get_or_create(name=name)[0] for name in genre_names]
@@ -92,6 +95,7 @@ class BookSerializer(serializers.ModelSerializer):
 class BookReadSerializer(serializers.ModelSerializer):
     genres = serializers.SlugRelatedField(many=True, read_only=True, slug_field='name')
     themes = serializers.SlugRelatedField(many=True, read_only=True, slug_field='name')
+    author_name = serializers.CharField(source="author.author_name", read_only=True)
 
     class Meta:
         model = Book
