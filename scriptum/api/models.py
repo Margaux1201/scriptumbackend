@@ -11,7 +11,7 @@ class User(models.Model):
     pseudo = models.CharField(max_length=30, unique=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
-    author_name = models.CharField(max_length=50, blank=True, null=True)
+    author_name = models.CharField(max_length=100, blank=True, null=True)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=128)
     birth_date = models.DateField()
@@ -43,7 +43,7 @@ class Book(models.Model):
     ]
 
     title = models.CharField(max_length=100)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(max_length=200, unique=True)
     release_date = models.DateField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='books')
     description = models.TextField()
@@ -162,7 +162,7 @@ class ChapterComment(models.Model):
     chapter = models.ForeignKey(Chapter, related_name='comments', on_delete=models.CASCADE)
     user = models.ForeignKey(User, related_name='comments', on_delete=models.CASCADE)
     publication_date = models.DateTimeField(auto_now_add=True)
-    content = models.TextField(max_length=500)
+    content = models.TextField(max_length=1000)
 
     class Meta:
         ordering = ['publication_date']

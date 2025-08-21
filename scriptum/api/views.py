@@ -3,9 +3,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, JSONParser
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import User, Book
+from .models import User, Book, Review
 from .utils import require_token
-from .serializers import UserSerializer, LoginSerializer, BookSerializer, BookReadSerializer
+from .serializers import UserSerializer, LoginSerializer, BookSerializer, BookReadSerializer, ReviewSerializer
 from .pagination import BookPagination
 from .filters import BookFilter
 
@@ -111,11 +111,11 @@ class BookListAllView(generics.ListAPIView):
     filterset_class = BookFilter
 
     # Recherche textuelle
-    search_fields = ["title", "description", "author__author_name"]
+    search_fields = ["title", "description", "author__author_name", "tome_name"]
 
     # Tri
-    ordering_fields = ["title", "release_date", "rating"]
-    ordering = ["release_date"] #ordre par défaut
+    ordering_fields = ["release_date", "rating", "title"]
+    ordering = ["-release_date", "-rating", "title"] #ordre par défaut
 
 # PUT editbook/ pour modifier des éléments du livre
 class BookUpdateView(APIView):
@@ -135,3 +135,22 @@ class BookUpdateView(APIView):
             return Response(BookReadSerializer(book).data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+# POST createreview/ pour créer une nouvelle review
+class ReviewCreateView(APIView):
+    @require_token
+
+    def post(self, request, *args, **kwargs):
+        serializer = ReviewSerializer(data = request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+# GET getallbookreviews/ pour récupérer toutes les reviews d'un livre
+class ReviewListView(generics.ListAPIView):
+    serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        slug = self.kwargs.get('slug')
+        return Review.objects.filter(book__slug=slug).order_by('-publication_date')

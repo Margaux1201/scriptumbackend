@@ -1,6 +1,5 @@
 from django.urls import path
-from .views import UserCreateView, UserLoginView, UserDeleteView, UserRetrieveView, UserUpdateView, BookCreateView, BookRetrieveView, BookListAllView, BookUpdateView
-
+from .views import UserCreateView, UserLoginView, UserDeleteView, UserRetrieveView, UserUpdateView, BookCreateView, BookRetrieveView, BookListAllView, BookUpdateView, ReviewCreateView, ReviewListView
 urlpatterns = [
     # PARTIE USER
     path('register/', UserCreateView.as_view(), name='user-register'),
@@ -12,5 +11,8 @@ urlpatterns = [
     path('createbook/', BookCreateView.as_view(), name='book-create'),
     path('getbookinfo/<slug:slug>/', BookRetrieveView.as_view(), name='book-getinfo'),
     path('getallbook/', BookListAllView.as_view(), name='book-getall'),
-    path('editbook/<slug:slug>/', BookUpdateView.as_view(), name='book-update')
+    path('editbook/<slug:slug>/', BookUpdateView.as_view(), name='book-update'),
+    # PARTIE REVIEW
+    path('createreview/', ReviewCreateView.as_view(), name='review-create'),
+    path('getallbookreviews/<slug:slug>/', ReviewListView.as_view(), name='review-getall')
 ]
