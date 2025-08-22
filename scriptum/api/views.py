@@ -68,7 +68,7 @@ class UserUpdateView(APIView):
 
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
@@ -184,3 +184,19 @@ class ChapterListView(generics.ListAPIView):
     def get_queryset(self):
         slug = self.kwargs.get('slug')
         return Chapter.objects.filter(book__slug=slug).order_by('sort_order')
+    
+# PUT editchapter/ pour modifier des éléments du chapitre
+class ChapterUpdateView(APIView):
+    @require_token
+    def patch(self, request, slug_book, slug_chapter): 
+        chapter = get_object_or_404(Chapter, book__slug=slug_book, slug=slug_chapter)
+        serializer = ChapterSerializer(chapter, data=request.data, partial=True)
+
+        if chapter.book.author != request.user:
+            return Response({'error': 'Permission refusée'}, status=status.HTTP_403_FORBIDDEN)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(ChapterSerializer(chapter).data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
