@@ -3,9 +3,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, JSONParser
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import User, Book, Review
+from django.shortcuts import get_object_or_404
+from .models import User, Book, Review, Chapter
 from .utils import require_token
-from .serializers import UserSerializer, LoginSerializer, BookSerializer, BookReadSerializer, ReviewSerializer
+from .serializers import UserSerializer, LoginSerializer, BookSerializer, BookReadSerializer, ReviewSerializer, ChapterSerializer
 from .pagination import BookPagination
 from .filters import BookFilter
 
@@ -154,3 +155,32 @@ class ReviewListView(generics.ListAPIView):
     def get_queryset(self):
         slug = self.kwargs.get('slug')
         return Review.objects.filter(book__slug=slug).order_by('-publication_date')
+    
+
+# PARTIE CHAPITRE
+
+# POST createchapter/ pour créer un nouveau chapitre
+class ChapterCreateView(APIView):
+    @require_token
+
+    def post(self, request, *args, **kwargs):
+        serializer = ChapterSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+# GET getchapterinfo/ pour récupérer les données d'un chapitre
+class ChapterRetrieveView(APIView):
+    def get(self, request, slug_book, slug_chapter):
+        chapter = get_object_or_404(Chapter, book__slug=slug_book, slug=slug_chapter)
+        serializer = ChapterSerializer(chapter, context={'request': request})
+        return Response(serializer.data)
+    
+# GET getallchapters/ pour récupérer tous les chapitres d'un livre
+class ChapterListView(generics.ListAPIView):
+    serializer_class = ChapterSerializer
+
+    def get_queryset(self):
+        slug = self.kwargs.get('slug')
+        return Chapter.objects.filter(book__slug=slug).order_by('sort_order')
