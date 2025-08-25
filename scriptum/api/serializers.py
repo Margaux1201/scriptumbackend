@@ -93,9 +93,6 @@ class BookSerializer(serializers.ModelSerializer):
         return book
     
     def update(self, instance, validated_data):
-        # Extraction des listes de genres / thèmes
-        genre_names = validated_data.pop('genres', [])
-        theme_names = validated_data.pop('themes', [])
 
         # Extraire warnings
         warnings_data = self.initial_data.get("warnings")
@@ -109,12 +106,16 @@ class BookSerializer(serializers.ModelSerializer):
 
         instance.save()
 
-        # Associer ou créer automatiquement
-        genres = [Genre.objects.get_or_create(name=name)[0] for name in genre_names]
-        themes = [Theme.objects.get_or_create(name=name)[0] for name in theme_names]
+        # 🔑 Ne mettre à jour que si présent dans la requête
+        if 'genres' in self.initial_data:
+            genre_names = validated_data.get('genres', [])
+            genres = [Genre.objects.get_or_create(name=name)[0] for name in genre_names]
+            instance.genres.set(genres)
 
-        instance.genres.set(genres)
-        instance.themes.set(themes)
+        if 'themes' in self.initial_data:
+            theme_names = validated_data.get('themes', [])
+            themes = [Theme.objects.get_or_create(name=name)[0] for name in theme_names]
+            instance.themes.set(themes)
 
         return instance
 
