@@ -241,7 +241,7 @@ class Character(models.Model):
         ('veuf.ve', 'Veuf.ve')
     ]
 
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=200)
     slug = models.SlugField()
     surname = models.CharField(max_length=50, blank=True, null=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
