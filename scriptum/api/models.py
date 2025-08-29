@@ -228,8 +228,8 @@ class Character(models.Model):
         ('neutre', 'Neutre')
     ]
     SEXE_CHOICES = [
-        ('masculin', 'Masculin'),
-        ('féminin', 'Féminin'),
+        ('homme', 'Homme'),
+        ('femme', 'Femme'),
         ('autre', 'Autre')
     ]
     RELATION_CHOICES = [
@@ -251,9 +251,9 @@ class Character(models.Model):
     height = models.CharField(max_length=10)
     background = models.TextField(max_length=1000)
     book = models.ForeignKey(Book, related_name='characters', on_delete=models.CASCADE)
-    species = models.CharField(max_length=30, default='Humain')
+    species = models.CharField(max_length=50, blank=True, null=True)
     is_there_race = models.BooleanField(default=False)
-    race = models.CharField(max_length=30, blank=True, null=True)
+    race = models.CharField(max_length=50, blank=True, null=True)
     character_trait = models.JSONField(blank=True, null=True)
     day_birth = models.IntegerField(blank=True, null=True)
     month_birth =  models.IntegerField(blank=True, null=True)
@@ -278,29 +278,29 @@ class Character(models.Model):
         month = self.month_birth
 
         if (month == 1 and day >= 20) or (month == 2 and day <= 18):
-            return "♒ Verseau"
+            return "♒"
         elif (month == 2 and day >= 19) or (month == 3 and day <= 20):
-            return "♓ Poissons"
+            return "♓"
         elif (month == 3 and day >= 21) or (month == 4 and day <= 19):
-            return "♈ Bélier"
+            return "♈"
         elif (month == 4 and day >= 20) or (month == 5 and day <= 20):
-            return "♉ Taureau"
+            return "♉"
         elif (month == 5 and day >= 21) or (month == 6 and day <= 20):
-            return "♊ Gémeaux"
+            return "♊"
         elif (month == 6 and day >= 21) or (month == 7 and day <= 22):
-            return "♋ Cancer"
+            return "♋"
         elif (month == 7 and day >= 23) or (month == 8 and day <= 22):
-            return "♌ Lion"
+            return "♌"
         elif (month == 8 and day >= 23) or (month == 9 and day <= 22):
-            return "♍ Vierge"
+            return "♍"
         elif (month == 9 and day >= 23) or (month == 10 and day <= 22):
-            return "♎ Balance"
+            return "♎"
         elif (month == 10 and day >= 23) or (month == 11 and day <= 21):
-            return "♏ Scorpion"
+            return "♏"
         elif (month == 11 and day >= 22) or (month == 12 and day <= 21):
-            return "♐ Sagittaire"
+            return "♐"
         elif (month == 12 and day >= 22) or (month == 1 and day <= 19):
-            return "♑ Capricorne"
+            return "♑"
         else:
             return None
 

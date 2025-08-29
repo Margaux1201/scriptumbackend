@@ -124,6 +124,7 @@ class BookReadSerializer(serializers.ModelSerializer):
     genres = serializers.SlugRelatedField(many=True, read_only=True, slug_field='name')
     themes = serializers.SlugRelatedField(many=True, read_only=True, slug_field='name')
     author_name = serializers.CharField(source="author.author_name", read_only=True)
+    author_token = serializers.CharField(source="author.token", read_only=True)
 
     class Meta:
         model = Book
