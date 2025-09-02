@@ -4,9 +4,9 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, JSONParser
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
-from .models import User, Book, Review, Chapter
+from .models import User, Book, Review, Chapter, Character
 from .utils import require_token
-from .serializers import UserSerializer, LoginSerializer, BookSerializer, BookReadSerializer, ReviewSerializer, ChapterSerializer
+from .serializers import UserSerializer, LoginSerializer, BookSerializer, BookReadSerializer, ReviewSerializer, ChapterSerializer, CharacterSerializer
 from .pagination import BookPagination
 from .filters import BookFilter
 
@@ -200,3 +200,50 @@ class ChapterUpdateView(APIView):
             return Response(ChapterSerializer(chapter).data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+# POST createcharacter/ pour créer un nouveau personnage
+class CharacterCreateView(APIView):
+    parser_classes = [MultiPartParser]
+    @require_token
+
+    def post(self, request, *args, **kwargs):
+        serializer = CharacterSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+# PUT updatecharacter/ pour modifier les infos d'un personnage
+class CharacterUpdateView(APIView):
+    parser_classes = [MultiPartParser, JSONParser]
+
+    @require_token
+
+    def patch(self, request, slug_book, slug_character):
+        character = get_object_or_404(Character, book__slug=slug_book, slug=slug_character)
+        serializer = CharacterSerializer(character, data=request.data, partial=True)
+
+        if character.book.author != request.user:
+            return Response({'error': 'Permission refusée'}, status=status.HTTP_403_FORBIDDEN)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(CharacterSerializer(character).data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+# GET getallcharacters/ pour afficher tous les personnages d'un livre
+class CharacterListView(generics.ListAPIView):
+    serializer_class = CharacterSerializer
+
+    def get_queryset(self):
+        slug = self.kwargs.get('slug')
+        return Character.objects.filter(book__slug=slug).order_by('name')
+    
+# GET getcharacterinfo/ pour afficher toutes les informations d'un personnage
+class CharactRetrieveView(APIView):
+    def get(self, request, slug_book, slug_character):
+        character = get_object_or_404(Character, book__slug=slug_book, slug=slug_character)
+        serializer = CharacterSerializer(character, context={'request': request})
+        return Response(serializer.data)

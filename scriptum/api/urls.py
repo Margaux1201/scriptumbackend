@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import UserCreateView, UserLoginView, UserDeleteView, UserRetrieveView, UserUpdateView, BookCreateView, BookRetrieveView, BookListAllView, BookUpdateView, ReviewCreateView, ReviewListView, ChapterCreateView, ChapterRetrieveView, ChapterListView, ChapterUpdateView
+from .views import UserCreateView, UserLoginView, UserDeleteView, UserRetrieveView, UserUpdateView, BookCreateView, BookRetrieveView, BookListAllView, BookUpdateView, ReviewCreateView, ReviewListView, ChapterCreateView, ChapterRetrieveView, ChapterListView, ChapterUpdateView, CharacterCreateView, CharacterUpdateView, CharacterListView, CharactRetrieveView
 urlpatterns = [
     # PARTIE USER
     path('register/', UserCreateView.as_view(), name='user-register'),
@@ -19,5 +19,10 @@ urlpatterns = [
     path('createchapter/', ChapterCreateView.as_view(), name='chapter-create'),
     path('<slug:slug_book>/getchapterinfo/<slug:slug_chapter>/', ChapterRetrieveView.as_view(), name='chapter-getinfo'),
     path('<slug:slug>/getallchapters/', ChapterListView.as_view(), name='chapter-getall'),
-    path('<slug:slug_book>/editchapter/<slug:slug_chapter>/', ChapterUpdateView.as_view(), name='chapter-update')
+    path('<slug:slug_book>/editchapter/<slug:slug_chapter>/', ChapterUpdateView.as_view(), name='chapter-update'),
+    # PARTIE CHARACTER
+    path('createcharacter/', CharacterCreateView.as_view(), name='character-create'),
+    path('<slug:slug_book>/updatecharacter/<slug:slug_character>/', CharacterUpdateView.as_view(), name='character-update'),
+    path('<slug:slug>/getallcharacters/', CharacterListView.as_view(), name='character-getall'),
+    path('<slug:slug_book>/getcharacterinfo/<slug:slug_character>/', CharactRetrieveView.as_view(), name='character-getinfo')
 ]

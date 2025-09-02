@@ -217,6 +217,7 @@ class Creature(models.Model):
         constraints = [ 
             models.UniqueConstraint(fields=['book', 'name'], name='unique_creature_name_per_book')
         ]
+     
 
 # Modèle pour créer la table de Personnages
 class Character(models.Model):
@@ -244,30 +245,30 @@ class Character(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField()
     surname = models.CharField(max_length=50, blank=True, null=True)
-    slogan = models.CharField(max_length=150)
+    slogan = models.CharField(max_length=150, blank=True, null=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
-    image = models.ImageField(upload_to='character_images/')
+    image = models.ImageField(storage=MediaCloudinaryStorage(), upload_to='characters/')
     age = models.IntegerField()
     sexe = models.CharField(max_length=10, choices=SEXE_CHOICES)
     height = models.CharField(max_length=10)
-    background = models.TextField(max_length=1000)
+    background = models.TextField(max_length=3000)
     book = models.ForeignKey(Book, related_name='characters', on_delete=models.CASCADE)
     species = models.CharField(max_length=50, blank=True, null=True)
     is_there_race = models.BooleanField(default=False)
     race = models.CharField(max_length=50, blank=True, null=True)
-    character_trait = models.JSONField(blank=True, null=True)
+    traits = models.JSONField(blank=True, null=True)
     day_birth = models.IntegerField(blank=True, null=True)
     month_birth =  models.IntegerField(blank=True, null=True)
     hometown = models.CharField(max_length=30, blank=True, null=True)
-    language = models.CharField(max_length=30, blank=True, null=True)
-    study = models.JSONField(blank=True, null=True)
+    languages = models.JSONField(blank=True, null=True)
+    studies = models.JSONField(blank=True, null=True)
     job = models.JSONField(blank=True, null=True)
     relation = models.CharField(blank=True, null=True, max_length=20, choices=RELATION_CHOICES)
     family = models.JSONField(blank=True, null=True)
-    addiction = models.JSONField(blank=True, null=True)
+    addictions = models.JSONField(blank=True, null=True)
     religion = models.CharField(max_length=30, blank=True, null=True)
-    fear = models.CharField(max_length=30, blank=True, null=True)
-    talent = models.CharField(max_length=30, blank=True, null=True)
+    fears = models.JSONField(blank=True, null=True)
+    talents = models.JSONField(blank=True, null=True)
 
 
     @property
