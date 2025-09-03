@@ -201,6 +201,18 @@ class ChapterUpdateView(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
+# DELETE deletechapter/ pour supprimer un chapitre
+class ChapterDeleteView(APIView):
+    @require_token
+    def delete(self, request, slug_book, slug_chapter):
+        chapter = get_object_or_404(Chapter, book__slug=slug_book, slug=slug_chapter)
+
+        if chapter.book.author != request.user:
+            return Response({"error": "non autorisé"}, status=status.HTTP_403_FORBIDDEN)
+        
+        chapter.delete()
+        return Response({"message": "Chapitre supprimé"}, status=status.HTTP_204_NO_CONTENT)
+        
 # POST createcharacter/ pour créer un nouveau personnage
 class CharacterCreateView(APIView):
     parser_classes = [MultiPartParser]
@@ -247,3 +259,15 @@ class CharactRetrieveView(APIView):
         character = get_object_or_404(Character, book__slug=slug_book, slug=slug_character)
         serializer = CharacterSerializer(character, context={'request': request})
         return Response(serializer.data)
+    
+#DELETE deletecharacter/ pour supprimer un compte utilisateur
+class CharacterDeleteView(APIView):
+    @require_token
+    def delete(self, request, slug_character):  
+        character = get_object_or_404(Character, slug=slug_character)
+
+        if character.book.author != request.user:
+            return Response({"error": "non autorisé"}, status=status.HTTP_403_FORBIDDEN)
+        
+        character.delete()
+        return Response({"message": "Personnage supprimé"}, status=status.HTTP_204_NO_CONTENT)
