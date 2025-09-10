@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.conf import settings
-from .models import User, Genre, Theme, Book, Review, Chapter, Character
+from .models import User, Genre, Theme, Book, Review, Chapter, Character, Place
 import json
 
 # Serializer pour créer un utilisateur dans Postgre
@@ -175,3 +175,13 @@ class CharacterSerializer(serializers.ModelSerializer):
         model = Character
         fields = "__all__"
         read_only_fields = ['slug', 'book']
+
+class PlaceSerializer(serializers.ModelSerializer):
+    book = serializers.SlugRelatedField(
+        queryset=Book.objects.all(),
+        slug_field='slug'
+    )
+    class Meta:
+        model: Place
+        fields = "__all__"
+        read_only_fields = ['book', 'slug']

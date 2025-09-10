@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import UserCreateView, UserLoginView, UserDeleteView, UserRetrieveView, UserUpdateView, BookCreateView, BookRetrieveView, BookListAllView, BookUpdateView, ReviewCreateView, ReviewListView, ChapterCreateView, ChapterRetrieveView, ChapterListView, ChapterUpdateView, CharacterCreateView, CharacterUpdateView, CharacterListView, CharactRetrieveView, CharacterDeleteView, ChapterDeleteView
+from .views import UserCreateView, UserLoginView, UserDeleteView, UserRetrieveView, UserUpdateView, BookCreateView, BookRetrieveView, BookListAllView, BookUpdateView, ReviewCreateView, ReviewListView, ChapterCreateView, ChapterRetrieveView, ChapterListView, ChapterUpdateView, CharacterCreateView, CharacterUpdateView, CharacterListView, CharactRetrieveView, CharacterDeleteView, ChapterDeleteView, PlaceCreateView, PlaceListView, PlaceRetrieveView, PlaceUpdateView, PlaceDeleteView
 urlpatterns = [
     # PARTIE USER
     path('register/', UserCreateView.as_view(), name='user-register'),
@@ -26,5 +26,11 @@ urlpatterns = [
     path('<slug:slug_book>/updatecharacter/<slug:slug_character>/', CharacterUpdateView.as_view(), name='character-update'),
     path('<slug:slug>/getallcharacters/', CharacterListView.as_view(), name='character-getall'),
     path('<slug:slug_book>/getcharacterinfo/<slug:slug_character>/', CharactRetrieveView.as_view(), name='character-getinfo'),
-    path('deletecharacter/<slug:slug_character>/', CharacterDeleteView.as_view(), name='character-delete')
+    path('<slug:slug_book>/deletecharacter/<slug:slug_character>/', CharacterDeleteView.as_view(), name='character-delete'),
+    # PARTIE PLACE
+    path('createplace/', PlaceCreateView.as_view(), name='place-create'),
+    path('<slug:slug_book>/updateplace/<slug:slug_place>/', PlaceUpdateView.as_view() , name="place-update"),
+    path('<slug:slug_book>/getallplaces/', PlaceListView.as_view(), name='place-getall'),
+    path('<slug:slug_book>/getinfoplace/<slug:slug_place>/', PlaceRetrieveView.as_view(), name='place-getinfo'),
+    path('<slug:slug_book>/deleteplace/<slug:slug_place>/', PlaceDeleteView.as_view(), name='place-delete')
 ]

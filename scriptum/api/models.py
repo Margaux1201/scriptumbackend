@@ -195,27 +195,51 @@ class FollowedAuthor(models.Model):
 # Modèle pour créer la table de Lieux
 class Place(models.Model):
     name = models.CharField(max_length=30)
-    image = models.ImageField(upload_to='place_images/')
+    image = models.ImageField(storage=MediaCloudinaryStorage(),upload_to='place_images/')
     content = models.TextField(max_length=1000)
     book = models.ForeignKey(Book, related_name='places', on_delete=models.CASCADE)
+    slug = models.SlugField(max_length=200, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.name)
+            slug = base_slug
+            num = 1
+            while Place.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{num}"
+                num += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ['name']
         constraints = [
-            models.UniqueConstraint(fields=['book', 'name'], name='unique_place_name_per_book')
+            models.UniqueConstraint(fields=['book', 'slug'], name='unique_place_slug_per_book')
         ]
 
 # Modèle pour créer la table de Créatures
 class Creature(models.Model):
     name = models.CharField(max_length=30)
-    image = models.ImageField(upload_to='creature_images/')
+    image = models.ImageField(storage=MediaCloudinaryStorage(),upload_to='creature_images/')
     content = models.TextField(max_length=1000)
     book = models.ForeignKey(Book, related_name='creatures', on_delete=models.CASCADE)
+    slug = models.SlugField(max_length=200, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.name)
+            slug = base_slug
+            num = 1
+            while Place.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{num}"
+                num += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ['name']
         constraints = [ 
-            models.UniqueConstraint(fields=['book', 'name'], name='unique_creature_name_per_book')
+            models.UniqueConstraint(fields=['book', 'slug'], name='unique_creature_slug_per_book')
         ]
      
 

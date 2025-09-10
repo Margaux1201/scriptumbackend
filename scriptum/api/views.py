@@ -4,9 +4,9 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, JSONParser
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
-from .models import User, Book, Review, Chapter, Character
+from .models import User, Book, Review, Chapter, Character, Place
 from .utils import require_token
-from .serializers import UserSerializer, LoginSerializer, BookSerializer, BookReadSerializer, ReviewSerializer, ChapterSerializer, CharacterSerializer
+from .serializers import UserSerializer, LoginSerializer, BookSerializer, BookReadSerializer, ReviewSerializer, ChapterSerializer, CharacterSerializer, PlaceSerializer
 from .pagination import BookPagination
 from .filters import BookFilter
 
@@ -212,6 +212,9 @@ class ChapterDeleteView(APIView):
         
         chapter.delete()
         return Response({"message": "Chapitre supprimé"}, status=status.HTTP_204_NO_CONTENT)
+    
+    
+# PARTIE PERSONNAGE
         
 # POST createcharacter/ pour créer un nouveau personnage
 class CharacterCreateView(APIView):
@@ -263,11 +266,72 @@ class CharactRetrieveView(APIView):
 #DELETE deletecharacter/ pour supprimer un compte utilisateur
 class CharacterDeleteView(APIView):
     @require_token
-    def delete(self, request, slug_character):  
-        character = get_object_or_404(Character, slug=slug_character)
+    def delete(self, request, slug_book, slug_character):  
+        character = get_object_or_404(Character, book__slug=slug_book, slug=slug_character)
 
         if character.book.author != request.user:
             return Response({"error": "non autorisé"}, status=status.HTTP_403_FORBIDDEN)
         
         character.delete()
         return Response({"message": "Personnage supprimé"}, status=status.HTTP_204_NO_CONTENT)
+    
+
+# PARTIE LIEUX
+
+# POST createplace/ pour créer un lieu d'un roman
+class PlaceCreateView(APIView):
+    parser_classes = [MultiPartParser]
+    @require_token
+    def post(self, request, *args, **kwargs):
+        serializer = PlaceSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+# GET getallplaces/ pour afficher tous les lieux d'un livre
+class PlaceListView(generics.ListAPIView):
+    serializer_class = PlaceSerializer
+
+    def get_queryset(self):
+        slug = self.kwargs.get('slug')
+        return Place.objects.filter(book__slug=slug).order_by('name')
+    
+# GET getinfoplace/ pour obtenir le détail d'un lieu
+class PlaceRetrieveView(APIView):
+    def get(self, request, slug_book, slug_place):
+        place = get_object_or_404(Place, book__slug=slug_book, slug=slug_place)
+        serializer = PlaceSerializer(place, context={"request": request})
+        return Response(serializer.data)
+    
+# PUT updateplace/ pour modifier un lieu d'un roman
+class PlaceUpdateView(APIView):
+    parser_classes = [MultiPartParser, JSONParser]
+    @require_token
+
+    def patch(self, request, slug_book, slug_place):
+        place = get_object_or_404(Place, book__slug=slug_book, slug=slug_place)
+        serializer = PlaceSerializer(place, data=request.data, partial=True)
+
+        if place.book.author != request.user:
+            return Response({"error": "Permission refusée"}, status=status.HTTP_403_FORBIDDEN)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(PlaceSerializer(place).data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# DELETE deleteplace/ pour supprimer un lieu d'un roman
+class PlaceDeleteView(APIView):
+    @require_token
+
+    def delete(self, request, slug_book, slug_place):
+        place = get_object_or_404(Place, book__slug=slug_book, slug=slug_place)
+        
+        if place.book.author != request.user:
+            return Response({'error': 'Permission refusée'}, status=status.HTTP_403_FORBIDDEN)
+        
+        place.delete()
+        return Response({"message": "Lieu supprimé"}, status=status.HTTP_204_NO_CONTENT)
