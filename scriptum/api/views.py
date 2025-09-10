@@ -295,8 +295,8 @@ class PlaceListView(generics.ListAPIView):
     serializer_class = PlaceSerializer
 
     def get_queryset(self):
-        slug = self.kwargs.get('slug')
-        return Place.objects.filter(book__slug=slug).order_by('name')
+        slug = self.kwargs.get('slug_book')
+        return Place.objects.filter(book__slug=slug)
     
 # GET getinfoplace/ pour obtenir le détail d'un lieu
 class PlaceRetrieveView(APIView):

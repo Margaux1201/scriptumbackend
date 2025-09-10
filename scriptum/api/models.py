@@ -195,7 +195,7 @@ class FollowedAuthor(models.Model):
 # Modèle pour créer la table de Lieux
 class Place(models.Model):
     name = models.CharField(max_length=30)
-    image = models.ImageField(storage=MediaCloudinaryStorage(),upload_to='place_images/')
+    image = models.ImageField(storage=MediaCloudinaryStorage(),upload_to='place/')
     content = models.TextField(max_length=1000)
     book = models.ForeignKey(Book, related_name='places', on_delete=models.CASCADE)
     slug = models.SlugField(max_length=200, null=True, blank=True)
@@ -220,7 +220,7 @@ class Place(models.Model):
 # Modèle pour créer la table de Créatures
 class Creature(models.Model):
     name = models.CharField(max_length=30)
-    image = models.ImageField(storage=MediaCloudinaryStorage(),upload_to='creature_images/')
+    image = models.ImageField(storage=MediaCloudinaryStorage(),upload_to='creatures/')
     content = models.TextField(max_length=1000)
     book = models.ForeignKey(Book, related_name='creatures', on_delete=models.CASCADE)
     slug = models.SlugField(max_length=200, null=True, blank=True)

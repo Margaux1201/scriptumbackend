@@ -182,6 +182,6 @@ class PlaceSerializer(serializers.ModelSerializer):
         slug_field='slug'
     )
     class Meta:
-        model: Place
+        model= Place
         fields = "__all__"
         read_only_fields = ['book', 'slug']
