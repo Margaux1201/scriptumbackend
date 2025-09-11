@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import UserCreateView, UserLoginView, UserDeleteView, UserRetrieveView, UserUpdateView, BookCreateView, BookRetrieveView, BookListAllView, BookUpdateView, ReviewCreateView, ReviewListView, ChapterCreateView, ChapterRetrieveView, ChapterListView, ChapterUpdateView, CharacterCreateView, CharacterUpdateView, CharacterListView, CharactRetrieveView, CharacterDeleteView, ChapterDeleteView, PlaceCreateView, PlaceListView, PlaceRetrieveView, PlaceUpdateView, PlaceDeleteView
+from .views import UserCreateView, UserLoginView, UserDeleteView, UserRetrieveView, UserUpdateView, BookCreateView, BookRetrieveView, BookListAllView, BookUpdateView, ReviewCreateView, ReviewListView, ChapterCreateView, ChapterRetrieveView, ChapterListView, ChapterUpdateView, CharacterCreateView, CharacterUpdateView, CharacterListView, CharactRetrieveView, CharacterDeleteView, ChapterDeleteView, PlaceCreateView, PlaceListView, PlaceRetrieveView, PlaceUpdateView, PlaceDeleteView, CreatureCreateView, CreatureListView, CreatureRetrieveView, CreatureUpdateView, CreatureDeleteView
 urlpatterns = [
     # PARTIE USER
     path('register/', UserCreateView.as_view(), name='user-register'),
@@ -32,5 +32,11 @@ urlpatterns = [
     path('<slug:slug_book>/updateplace/<slug:slug_place>/', PlaceUpdateView.as_view() , name="place-update"),
     path('<slug:slug_book>/getallplaces/', PlaceListView.as_view(), name='place-getall'),
     path('<slug:slug_book>/getinfoplace/<slug:slug_place>/', PlaceRetrieveView.as_view(), name='place-getinfo'),
-    path('<slug:slug_book>/deleteplace/<slug:slug_place>/', PlaceDeleteView.as_view(), name='place-delete')
+    path('<slug:slug_book>/deleteplace/<slug:slug_place>/', PlaceDeleteView.as_view(), name='place-delete'),
+    # PARTIE CREATURE
+    path('createcreature/', CreatureCreateView.as_view(), name='creature-create'),
+    path('<slug:slug_book>/updatecreature/<slug:slug_creature>/', CreatureUpdateView.as_view() , name="creature-update"),
+    path('<slug:slug_book>/getallcreatures/', CreatureListView.as_view(), name='creature-getall'),
+    path('<slug:slug_book>/getinfocreature/<slug:slug_creature>/', CreatureRetrieveView.as_view(), name='creature-getinfo'),
+    path('<slug:slug_book>/deletecreature/<slug:slug_creature>/', CreatureDeleteView.as_view(), name='creature-delete')
 ]

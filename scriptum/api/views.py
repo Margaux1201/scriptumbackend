@@ -4,9 +4,9 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, JSONParser
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
-from .models import User, Book, Review, Chapter, Character, Place
+from .models import User, Book, Review, Chapter, Character, Place, Creature
 from .utils import require_token
-from .serializers import UserSerializer, LoginSerializer, BookSerializer, BookReadSerializer, ReviewSerializer, ChapterSerializer, CharacterSerializer, PlaceSerializer
+from .serializers import UserSerializer, LoginSerializer, BookSerializer, BookReadSerializer, ReviewSerializer, ChapterSerializer, CharacterSerializer, PlaceSerializer, CreatureSerializer
 from .pagination import BookPagination
 from .filters import BookFilter
 
@@ -305,7 +305,7 @@ class PlaceRetrieveView(APIView):
         serializer = PlaceSerializer(place, context={"request": request})
         return Response(serializer.data)
     
-# PUT updateplace/ pour modifier un lieu d'un roman
+# PATCH updateplace/ pour modifier un lieu d'un roman
 class PlaceUpdateView(APIView):
     parser_classes = [MultiPartParser, JSONParser]
     @require_token
@@ -335,3 +335,67 @@ class PlaceDeleteView(APIView):
         
         place.delete()
         return Response({"message": "Lieu supprimé"}, status=status.HTTP_204_NO_CONTENT)
+    
+
+# PARTIE CREATURE
+
+
+# POST createcreature/ pour créer une créature
+class CreatureCreateView(APIView):
+    parser_classes = [MultiPartParser]
+    @require_token
+
+    def post(self, request, *args, **kwargs):
+        serializer = CreatureSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+# GET getallcreatures/ pour afficher toutes les créatures d'un livre
+class CreatureListView(generics.ListAPIView):
+    serializer_class = CreatureSerializer
+
+    def get_queryset(self):
+        slug = self.kwargs.get('slug_book')
+        return Creature.objects.filter(book__slug=slug)
+
+# GET getinfocreature/ pour récupérer les détails d'une créature
+class CreatureRetrieveView(APIView):
+
+    def get(self, request, slug_book, slug_creature):
+        creature = get_object_or_404(Creature, book__slug=slug_book, slug=slug_creature)
+        serializer = CreatureSerializer(creature, context={"request": request})
+        return Response(serializer.data)
+    
+# PATCH updatecreature/ pour modifier une créature
+class CreatureUpdateView(APIView):
+    parser_classes=[MultiPartParser, JSONParser]
+    @require_token
+
+    def patch(self, request, slug_book, slug_creature):
+        creature = get_object_or_404(Creature, book__slug=slug_book, slug=slug_creature)
+        serializer = CreatureSerializer(creature, data=request.data, partial=True)
+
+        if creature.book.author != request.user:
+            return Response({"error": "utilisateur non autorisé"}, status=status.HTTP_403_FORBIDDEN)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(CreatureSerializer(creature).data, status=status.HTTP_200_OK)
+        else :
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# DELETE deletecreature/ pour supprimer une créature
+class CreatureDeleteView(APIView):
+    @require_token
+
+    def delete(self, request, slug_book, slug_creature):
+        creature = get_object_or_404(Creature, book__slug=slug_book, slug=slug_creature)
+
+        if creature.book.author != request.user:
+            return Response({"error": "utilisateur non autorisé"}, status=status.HTTP_403_FORBIDDEN)
+        
+        creature.delete()
+        return Response({"message": "créature supprimée"}, status=status.HTTP_204_NO_CONTENT)
