@@ -11,7 +11,7 @@ class User(models.Model):
     pseudo = models.CharField(max_length=30, unique=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
-    author_name = models.CharField(max_length=100, blank=True, null=True)
+    author_name = models.CharField(max_length=100, blank=True, null=True, unique=True)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=128)
     birth_date = models.DateField()

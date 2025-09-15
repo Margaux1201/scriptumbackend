@@ -9,6 +9,7 @@ from .utils import require_token
 from .serializers import UserSerializer, LoginSerializer, BookSerializer, BookReadSerializer, ReviewSerializer, ChapterSerializer, CharacterSerializer, PlaceSerializer, CreatureSerializer
 from .pagination import BookPagination
 from .filters import BookFilter
+from django.db import IntegrityError
 
 
 # PARTIE UTILISATEUR
@@ -67,8 +68,11 @@ class UserUpdateView(APIView):
         serializer = UserSerializer(user, data=request.data, partial=True)
 
         if serializer.is_valid():
-            serializer.save()
-            return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
+            try:
+                serializer.save()
+                return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
+            except IntegrityError as e:
+                return Response({'error': "Ce pseudo ou cet email est déjà utilisé."}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
@@ -117,6 +121,15 @@ class BookListAllView(generics.ListAPIView):
     # Tri
     ordering_fields = ["release_date", "rating", "title"]
     ordering = ["-release_date", "-rating", "title"] #ordre par défaut
+
+# GET getallauthorbook/ pour récupérer tous les livres d'un auteur
+class BookListByAuthorView(generics.ListAPIView):
+    serializer_class = BookReadSerializer
+
+    def get_queryset(self):
+        token = self.kwargs.get('token')
+        return Book.objects.filter(author__token=token)
+
 
 # PUT editbook/ pour modifier des éléments du livre
 class BookUpdateView(APIView):
