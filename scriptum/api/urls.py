@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import UserCreateView, UserLoginView, UserDeleteView, UserRetrieveView, UserUpdateView, BookCreateView, BookRetrieveView, BookListAllView, BookUpdateView, ReviewCreateView, ReviewListView, ChapterCreateView, ChapterRetrieveView, ChapterListView, ChapterUpdateView, CharacterCreateView, CharacterUpdateView, CharacterListView, CharactRetrieveView, CharacterDeleteView, ChapterDeleteView, PlaceCreateView, PlaceListView, PlaceRetrieveView, PlaceUpdateView, PlaceDeleteView, CreatureCreateView, CreatureListView, CreatureRetrieveView, CreatureUpdateView, CreatureDeleteView, BookListByAuthorView
+from .views import UserCreateView, UserLoginView, UserDeleteView, UserRetrieveView, UserUpdateView, BookCreateView, BookRetrieveView, BookListAllView, BookUpdateView, ReviewCreateView, ReviewListView, ChapterCreateView, ChapterRetrieveView, ChapterListView, ChapterUpdateView, CharacterCreateView, CharacterUpdateView, CharacterListView, CharactRetrieveView, CharacterDeleteView, ChapterDeleteView, PlaceCreateView, PlaceListView, PlaceRetrieveView, PlaceUpdateView, PlaceDeleteView, CreatureCreateView, CreatureListView, CreatureRetrieveView, CreatureUpdateView, CreatureDeleteView, BookListByAuthorView, BookListByOtherAuthorView, BookDeleteView
 urlpatterns = [
     # PARTIE USER
     path('register/', UserCreateView.as_view(), name='user-register'),
@@ -13,6 +13,8 @@ urlpatterns = [
     path('getallbook/', BookListAllView.as_view(), name='book-getall'),
     path('editbook/<slug:slug>/', BookUpdateView.as_view(), name='book-update'),
     path('<uuid:token>/getallauthorbook/', BookListByAuthorView.as_view(), name='book-getallbyauthor'),
+    path('<str:author>/getallotherauthorbook/', BookListByOtherAuthorView.as_view(), name='book-getallbyotherauthor'),
+    path('deletebook/<slug:slug>/', BookDeleteView.as_view(), name='book-delete'),
     # PARTIE REVIEW
     path('createreview/', ReviewCreateView.as_view(), name='review-create'),
     path('getallbookreviews/<slug:slug>/', ReviewListView.as_view(), name='review-getall'),

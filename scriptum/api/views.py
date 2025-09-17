@@ -130,6 +130,14 @@ class BookListByAuthorView(generics.ListAPIView):
         token = self.kwargs.get('token')
         return Book.objects.filter(author__token=token)
 
+# GET getallotherauthorbook/ pour récupérer tous les livres d'un auteur    
+class BookListByOtherAuthorView(generics.ListAPIView):
+    serializer_class = BookReadSerializer
+
+    def get_queryset(self):
+        author = self.kwargs.get('author')
+        return Book.objects.filter(author__author_name=author)
+
 
 # PUT editbook/ pour modifier des éléments du livre
 class BookUpdateView(APIView):
@@ -149,6 +157,21 @@ class BookUpdateView(APIView):
             return Response(BookReadSerializer(book).data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+              
+# DELETE deletebook/ pour supprimer un livre
+class BookDeleteView(APIView):
+    @require_token
+
+    def delete(self, request, slug):
+        book = get_object_or_404(Book, slug=slug)
+
+        if book.author != request.user:
+            return Response({"error": "Vous devez être l'auteur de ce livre pour le supprimer"}, status=status.HTTP_403_FORBIDDEN)
+
+        book.delete()
+        return Response({"message": "Le livre a été supprimé"}, status=status.HTTP_204_NO_CONTENT)   
+
+# PARTIE REVIEW
         
 # POST createreview/ pour créer une nouvelle review
 class ReviewCreateView(APIView):
