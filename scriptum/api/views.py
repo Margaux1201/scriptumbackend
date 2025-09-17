@@ -4,9 +4,9 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, JSONParser
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
-from .models import User, Book, Review, Chapter, Character, Place, Creature
+from .models import User, Book, Review, Chapter, Character, Place, Creature, Favorite
 from .utils import require_token
-from .serializers import UserSerializer, LoginSerializer, BookSerializer, BookReadSerializer, ReviewSerializer, ChapterSerializer, CharacterSerializer, PlaceSerializer, CreatureSerializer
+from .serializers import UserSerializer, LoginSerializer, BookSerializer, BookReadSerializer, ReviewSerializer, ChapterSerializer, CharacterSerializer, PlaceSerializer, CreatureSerializer, FavoriteSerializer
 from .pagination import BookPagination
 from .filters import BookFilter
 from django.db import IntegrityError
@@ -435,3 +435,47 @@ class CreatureDeleteView(APIView):
         
         creature.delete()
         return Response({"message": "créature supprimée"}, status=status.HTTP_204_NO_CONTENT)
+    
+
+# PARTIE FAVORITE
+
+# POST newfavorite/ pour créer un nouveau favori d'un utilisateur
+class FavoriteCreateView(APIView):
+    @require_token
+
+    def post(self, request, *args, **kwargs):
+        serializer = FavoriteSerializer(data=request.data)
+
+        if serializer.is_valid():
+
+            # Récupérer le livre choisi par le slug
+            book = serializer.validated_data["book"]
+
+            if Favorite.objects.filter(user=request.user, book=book).exists():
+                return Response(
+                    {"error": "Ce livre est déjà dans vos favoris."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+# DELETE deletefavorite/ pour supprimer un favori d'un utilisateur
+class FavoriteDeleteView(APIView):
+    @require_token
+
+    def delete(self, request, slug_book, *args, **kwargs):
+        favorite_book = get_object_or_404(Favorite, user=request.user, book__slug=slug_book)
+
+        favorite_book.delete()
+        return Response({"message": "Le livre a été supprimé des favoris de l'utilisateur"}, status=status.HTTP_204_NO_CONTENT)
+    
+# GET getallfavorite/ pour récupérer tous les favoris d'un utilisateur
+class FavoriteListView(generics.ListAPIView):
+    serializer_class = FavoriteSerializer
+
+    def get_queryset(self):
+        token = self.kwargs.get('token')
+        user = get_object_or_404(User, token=token)
+        return Favorite.objects.filter(user=user)

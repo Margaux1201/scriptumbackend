@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import UserCreateView, UserLoginView, UserDeleteView, UserRetrieveView, UserUpdateView, BookCreateView, BookRetrieveView, BookListAllView, BookUpdateView, ReviewCreateView, ReviewListView, ChapterCreateView, ChapterRetrieveView, ChapterListView, ChapterUpdateView, CharacterCreateView, CharacterUpdateView, CharacterListView, CharactRetrieveView, CharacterDeleteView, ChapterDeleteView, PlaceCreateView, PlaceListView, PlaceRetrieveView, PlaceUpdateView, PlaceDeleteView, CreatureCreateView, CreatureListView, CreatureRetrieveView, CreatureUpdateView, CreatureDeleteView, BookListByAuthorView, BookListByOtherAuthorView, BookDeleteView
+from .views import UserCreateView, UserLoginView, UserDeleteView, UserRetrieveView, UserUpdateView, BookCreateView, BookRetrieveView, BookListAllView, BookUpdateView, ReviewCreateView, ReviewListView, ChapterCreateView, ChapterRetrieveView, ChapterListView, ChapterUpdateView, CharacterCreateView, CharacterUpdateView, CharacterListView, CharactRetrieveView, CharacterDeleteView, ChapterDeleteView, PlaceCreateView, PlaceListView, PlaceRetrieveView, PlaceUpdateView, PlaceDeleteView, CreatureCreateView, CreatureListView, CreatureRetrieveView, CreatureUpdateView, CreatureDeleteView, BookListByAuthorView, BookListByOtherAuthorView, BookDeleteView, FavoriteCreateView, FavoriteDeleteView, FavoriteListView
 urlpatterns = [
     # PARTIE USER
     path('register/', UserCreateView.as_view(), name='user-register'),
@@ -41,5 +41,9 @@ urlpatterns = [
     path('<slug:slug_book>/updatecreature/<slug:slug_creature>/', CreatureUpdateView.as_view() , name="creature-update"),
     path('<slug:slug_book>/getallcreatures/', CreatureListView.as_view(), name='creature-getall'),
     path('<slug:slug_book>/getinfocreature/<slug:slug_creature>/', CreatureRetrieveView.as_view(), name='creature-getinfo'),
-    path('<slug:slug_book>/deletecreature/<slug:slug_creature>/', CreatureDeleteView.as_view(), name='creature-delete')
+    path('<slug:slug_book>/deletecreature/<slug:slug_creature>/', CreatureDeleteView.as_view(), name='creature-delete'),
+    # PARTIE FAVORITE
+    path('newfavorite/', FavoriteCreateView.as_view(), name='favorite-create'),
+    path('deletefavorite/<slug:slug_book>/', FavoriteDeleteView.as_view(), name='favorite-delete'),
+    path('getallfavorite/<uuid:token>/', FavoriteListView.as_view(), name='favorite-getall')
 ]
