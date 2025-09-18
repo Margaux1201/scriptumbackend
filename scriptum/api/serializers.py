@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.conf import settings
-from .models import User, Genre, Theme, Book, Review, Chapter, Character, Place, Creature, Favorite
+from .models import User, Genre, Theme, Book, Review, Chapter, Character, Place, Creature, Favorite, FollowedAuthor
 import json
 
 # Serializer pour créer un utilisateur dans Postgre
@@ -200,7 +200,35 @@ class FavoriteSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(read_only=True)
     book = serializers.SlugRelatedField(queryset=Book.objects.all(), slug_field='slug')
     user_pseudo = serializers.CharField(source='user.pseudo', read_only=True)
+    book_image = serializers.ImageField(source='book.image', read_only=True)
+    book_title = serializers.CharField(source='book.title', read_only=True)
+    book_state = serializers.CharField(source='book.state', read_only=True)
+    book_author = serializers.CharField(source='book.author.author_name', read_only=True)
+    book_rating = serializers.FloatField(source='book.rating', read_only=True)
 
     class Meta:
         model = Favorite
+        fields = "__all__"
+
+
+class AuthorWithBooksSerializer(serializers.ModelSerializer):
+    books = BookReadSerializer(many=True, read_only=True)
+
+    class Meta:
+        model= User
+        fields = ["author_name", "books"]
+
+class FollowedAuthorSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    author = AuthorWithBooksSerializer(read_only=True)
+
+    author_name = serializers.SlugRelatedField(
+        slug_field="author_name",
+        queryset=User.objects.all(),
+        source="author",
+        write_only=True
+    )
+
+    class Meta:
+        model = FollowedAuthor
         fields = "__all__"

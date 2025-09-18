@@ -181,8 +181,8 @@ class Favorite(models.Model):
 
 # Modèle pour stocker les auteurs suivis par les utilisateurs
 class FollowedAuthor(models.Model):
-    user = models.ForeignKey(User, related_name='followed_authors', on_delete=models.CASCADE)
-    author = models.ForeignKey(User, related_name='followers', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='followers', on_delete=models.CASCADE)
+    author = models.ForeignKey(User, related_name='followed_authors', on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['author__author_name']

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import UserCreateView, UserLoginView, UserDeleteView, UserRetrieveView, UserUpdateView, BookCreateView, BookRetrieveView, BookListAllView, BookUpdateView, ReviewCreateView, ReviewListView, ChapterCreateView, ChapterRetrieveView, ChapterListView, ChapterUpdateView, CharacterCreateView, CharacterUpdateView, CharacterListView, CharactRetrieveView, CharacterDeleteView, ChapterDeleteView, PlaceCreateView, PlaceListView, PlaceRetrieveView, PlaceUpdateView, PlaceDeleteView, CreatureCreateView, CreatureListView, CreatureRetrieveView, CreatureUpdateView, CreatureDeleteView, BookListByAuthorView, BookListByOtherAuthorView, BookDeleteView, FavoriteCreateView, FavoriteDeleteView, FavoriteListView
+from .views import UserCreateView, UserLoginView, UserDeleteView, UserRetrieveView, UserUpdateView, BookCreateView, BookRetrieveView, BookListAllView, BookUpdateView, ReviewCreateView, ReviewListView, ChapterCreateView, ChapterRetrieveView, ChapterListView, ChapterUpdateView, CharacterCreateView, CharacterUpdateView, CharacterListView, CharactRetrieveView, CharacterDeleteView, ChapterDeleteView, PlaceCreateView, PlaceListView, PlaceRetrieveView, PlaceUpdateView, PlaceDeleteView, CreatureCreateView, CreatureListView, CreatureRetrieveView, CreatureUpdateView, CreatureDeleteView, BookListByAuthorView, BookDeleteView, FavoriteCreateView, FavoriteDeleteView, FavoriteListView, FollowedAuthorCreateView, FollowedAuthorDeleteView, FollowedAuthorListView
 urlpatterns = [
     # PARTIE USER
     path('register/', UserCreateView.as_view(), name='user-register'),
@@ -13,7 +13,6 @@ urlpatterns = [
     path('getallbook/', BookListAllView.as_view(), name='book-getall'),
     path('editbook/<slug:slug>/', BookUpdateView.as_view(), name='book-update'),
     path('<uuid:token>/getallauthorbook/', BookListByAuthorView.as_view(), name='book-getallbyauthor'),
-    path('<str:author>/getallotherauthorbook/', BookListByOtherAuthorView.as_view(), name='book-getallbyotherauthor'),
     path('deletebook/<slug:slug>/', BookDeleteView.as_view(), name='book-delete'),
     # PARTIE REVIEW
     path('createreview/', ReviewCreateView.as_view(), name='review-create'),
@@ -45,5 +44,9 @@ urlpatterns = [
     # PARTIE FAVORITE
     path('newfavorite/', FavoriteCreateView.as_view(), name='favorite-create'),
     path('deletefavorite/<slug:slug_book>/', FavoriteDeleteView.as_view(), name='favorite-delete'),
-    path('getallfavorite/<uuid:token>/', FavoriteListView.as_view(), name='favorite-getall')
+    path('getallfavorite/<uuid:token>/', FavoriteListView.as_view(), name='favorite-getall'),
+    # PARTIE AUTEUR SUIVI
+    path('newfollowedauthor/', FollowedAuthorCreateView.as_view(), name='followedauthor-create'),
+    path('deletefollowedauthor/<str:author_name>/', FollowedAuthorDeleteView.as_view(), name='followedauthor-delete'),
+    path('getallfollowedauthors/<uuid:token>/', FollowedAuthorListView.as_view(), name='followedauthor-getall')
 ]

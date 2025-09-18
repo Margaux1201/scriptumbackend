@@ -4,9 +4,9 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, JSONParser
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
-from .models import User, Book, Review, Chapter, Character, Place, Creature, Favorite
+from .models import User, Book, Review, Chapter, Character, Place, Creature, Favorite, FollowedAuthor
 from .utils import require_token
-from .serializers import UserSerializer, LoginSerializer, BookSerializer, BookReadSerializer, ReviewSerializer, ChapterSerializer, CharacterSerializer, PlaceSerializer, CreatureSerializer, FavoriteSerializer
+from .serializers import UserSerializer, LoginSerializer, BookSerializer, BookReadSerializer, ReviewSerializer, ChapterSerializer, CharacterSerializer, PlaceSerializer, CreatureSerializer, FavoriteSerializer, FollowedAuthorSerializer
 from .pagination import BookPagination
 from .filters import BookFilter
 from django.db import IntegrityError
@@ -129,14 +129,6 @@ class BookListByAuthorView(generics.ListAPIView):
     def get_queryset(self):
         token = self.kwargs.get('token')
         return Book.objects.filter(author__token=token)
-
-# GET getallotherauthorbook/ pour récupérer tous les livres d'un auteur    
-class BookListByOtherAuthorView(generics.ListAPIView):
-    serializer_class = BookReadSerializer
-
-    def get_queryset(self):
-        author = self.kwargs.get('author')
-        return Book.objects.filter(author__author_name=author)
 
 
 # PUT editbook/ pour modifier des éléments du livre
@@ -479,3 +471,43 @@ class FavoriteListView(generics.ListAPIView):
         token = self.kwargs.get('token')
         user = get_object_or_404(User, token=token)
         return Favorite.objects.filter(user=user)
+    
+
+# PARTIE AUTEUR SUIVI
+
+# POST newfollowedauthor/ pour créer le suivi d'un auteur par un utilisateur
+class FollowedAuthorCreateView(APIView):
+    @require_token
+
+    def post(self, request, *args, **kwargs):
+        serializer= FollowedAuthorSerializer(data=request.data)
+
+        if serializer.is_valid():
+
+            author = serializer.validated_data["author"]
+
+            if FollowedAuthor.objects.filter(user=request.user, author=author).exists():
+                return Response({"error": "Cet auteur est déjà dans vos suivis."}, status=status.HTTP_400_BAD_REQUEST)
+
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# DELETE deletefollowedauthor/ pour supprimer le suivi d'un auteur par un utilisateur
+class FollowedAuthorDeleteView(APIView):
+    @require_token
+
+    def delete(self, request, author_name, *args, **kwargs):
+        followed_author  = get_object_or_404(FollowedAuthor, user=request.user, author__author_name=author_name)
+
+        followed_author .delete()
+        return Response({"message": f"{author_name} a été supprimé des suivis de l'utilisateurs"}, status=status.HTTP_204_NO_CONTENT)
+    
+# GET getallfollowedauthors/ pour récupérer tous les auteurs suivis de l'utilisateurs
+class FollowedAuthorListView(generics.ListAPIView):
+    serializer_class = FollowedAuthorSerializer
+
+    def get_queryset(self):
+        token = self.kwargs.get('token')
+        user = get_object_or_404(User, token=token)
+        return FollowedAuthor.objects.filter(user=user)
