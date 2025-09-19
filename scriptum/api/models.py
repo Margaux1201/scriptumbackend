@@ -130,13 +130,31 @@ class Chapter(models.Model):
         ordering = ['sort_order', 'chapter_number']
 
     def save(self, *args, **kwargs):
-        # Génère le slug s'il n'existe pas
+        # Déterminer le slug "de base" selon le type
+        if self.type == "chapitre":
+            if self.chapter_number is None:
+                raise ValidationError("Le numéro de chapitre doit être renseigné pour un chapitre.")
+            base_slug = slugify(f"{self.type}-{self.chapter_number}")
+        else:
+            base_slug = slugify(self.type)
+
+        # Vérifier si on doit régénérer le slug
+        regenerate_slug = False
         if not self.slug:
-            if self.type == 'chapitre':
-                base_slug = slugify(f"{self.type}-{self.chapter_number}")
-            else:
-                base_slug = slugify(self.type)
-            self.slug = base_slug
+            regenerate_slug = True
+        elif self.type == "chapitre" and str(self.chapter_number) not in self.slug:
+            regenerate_slug = True
+        elif self.type in ["prologue", "epilogue"] and not self.slug.startswith(self.type):
+            regenerate_slug = True
+
+        if regenerate_slug:
+            slug_candidate = base_slug
+            num = 1
+            # S'assurer que le slug est unique pour ce livre
+            while Chapter.objects.filter(book=self.book, slug=slug_candidate).exclude(pk=self.pk).exists():
+                slug_candidate = f"{base_slug}-{num}"
+                num += 1
+            self.slug = slug_candidate
 
         # Définit l'ordre des chapitres
         if self.type == 'prologue':

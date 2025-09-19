@@ -120,11 +120,12 @@ class BookListAllView(generics.ListAPIView):
 
     # Tri
     ordering_fields = ["release_date", "rating", "title"]
-    ordering = ["-release_date", "-rating", "title"] #ordre par défaut
+    ordering = ["-rating", "-release_date", "title"] #ordre par défaut
 
 # GET getallauthorbook/ pour récupérer tous les livres d'un auteur
 class BookListByAuthorView(generics.ListAPIView):
     serializer_class = BookReadSerializer
+    pagination_class = None
 
     def get_queryset(self):
         token = self.kwargs.get('token')
@@ -208,10 +209,11 @@ class ChapterRetrieveView(APIView):
 # GET getallchapters/ pour récupérer tous les chapitres d'un livre
 class ChapterListView(generics.ListAPIView):
     serializer_class = ChapterSerializer
+    pagination_class = None
 
     def get_queryset(self):
         slug = self.kwargs.get('slug')
-        return Chapter.objects.filter(book__slug=slug).order_by('sort_order')
+        return Chapter.objects.filter(book__slug=slug).order_by('sort_order', 'chapter_number')
     
 # PUT editchapter/ pour modifier des éléments du chapitre
 class ChapterUpdateView(APIView):
@@ -279,6 +281,7 @@ class CharacterUpdateView(APIView):
 # GET getallcharacters/ pour afficher tous les personnages d'un livre
 class CharacterListView(generics.ListAPIView):
     serializer_class = CharacterSerializer
+    pagination_class = None
 
     def get_queryset(self):
         slug = self.kwargs.get('slug')
@@ -321,6 +324,7 @@ class PlaceCreateView(APIView):
 # GET getallplaces/ pour afficher tous les lieux d'un livre
 class PlaceListView(generics.ListAPIView):
     serializer_class = PlaceSerializer
+    pagination_class = None
 
     def get_queryset(self):
         slug = self.kwargs.get('slug_book')
@@ -384,6 +388,7 @@ class CreatureCreateView(APIView):
 # GET getallcreatures/ pour afficher toutes les créatures d'un livre
 class CreatureListView(generics.ListAPIView):
     serializer_class = CreatureSerializer
+    pagination_class = None
 
     def get_queryset(self):
         slug = self.kwargs.get('slug_book')
@@ -466,6 +471,7 @@ class FavoriteDeleteView(APIView):
 # GET getallfavorite/ pour récupérer tous les favoris d'un utilisateur
 class FavoriteListView(generics.ListAPIView):
     serializer_class = FavoriteSerializer
+    pagination_class = None
 
     def get_queryset(self):
         token = self.kwargs.get('token')
@@ -506,6 +512,7 @@ class FollowedAuthorDeleteView(APIView):
 # GET getallfollowedauthors/ pour récupérer tous les auteurs suivis de l'utilisateurs
 class FollowedAuthorListView(generics.ListAPIView):
     serializer_class = FollowedAuthorSerializer
+    pagination_class = None
 
     def get_queryset(self):
         token = self.kwargs.get('token')
