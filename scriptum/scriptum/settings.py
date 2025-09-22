@@ -12,21 +12,22 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+load_dotenv()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-4c0nmc0q74v42_p_codu)*(&^c8@=o#17^+@-82lk6*fngsrj@'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # Dossier où seront stockés les fichiers uploadés
 # MEDIA_URL = '/media/'  # URL publique pour accéder aux fichiers
@@ -98,11 +99,11 @@ WSGI_APPLICATION = 'scriptum.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'scriptum_db',
-        'USER': 'postgres',
-        'PASSWORD': 'ze0zzccx',
-        'HOST': 'localhost',
-        'PORT': '5432',      
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),      
     }
 }
 
@@ -114,9 +115,9 @@ REST_FRAMEWORK = {
 
 # Cloudinary config
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'dc2evzzlq',
-    'API_KEY': '923716599433769',
-    'API_SECRET': 'rLlxlTze8kFgPsipgPso2Eg4EeA',
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
 
