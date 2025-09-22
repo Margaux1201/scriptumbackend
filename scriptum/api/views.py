@@ -10,6 +10,7 @@ from .serializers import UserSerializer, LoginSerializer, BookSerializer, BookRe
 from .pagination import BookPagination
 from .filters import BookFilter
 from django.db import IntegrityError
+from django.http import JsonResponse
 
 
 # PARTIE UTILISATEUR
@@ -518,3 +519,13 @@ class FollowedAuthorListView(generics.ListAPIView):
         token = self.kwargs.get('token')
         user = get_object_or_404(User, token=token)
         return FollowedAuthor.objects.filter(user=user)
+    
+
+# TEST REQUETE DEPLOIEMENT
+
+def healthcheck(request):
+    try:
+        count = Chapter.objects.count()
+        return JsonResponse({"ok": True, "chapters_in_db": count})
+    except Exception as e:
+        return JsonResponse({"ok": False, "error": str(e)})

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import UserCreateView, UserLoginView, UserDeleteView, UserRetrieveView, UserUpdateView, BookCreateView, BookRetrieveView, BookListAllView, BookUpdateView, ReviewCreateView, ReviewListView, ChapterCreateView, ChapterRetrieveView, ChapterListView, ChapterUpdateView, CharacterCreateView, CharacterUpdateView, CharacterListView, CharactRetrieveView, CharacterDeleteView, ChapterDeleteView, PlaceCreateView, PlaceListView, PlaceRetrieveView, PlaceUpdateView, PlaceDeleteView, CreatureCreateView, CreatureListView, CreatureRetrieveView, CreatureUpdateView, CreatureDeleteView, BookListByAuthorView, BookDeleteView, FavoriteCreateView, FavoriteDeleteView, FavoriteListView, FollowedAuthorCreateView, FollowedAuthorDeleteView, FollowedAuthorListView
+from .views import UserCreateView, UserLoginView, UserDeleteView, UserRetrieveView, UserUpdateView, BookCreateView, BookRetrieveView, BookListAllView, BookUpdateView, ReviewCreateView, ReviewListView, ChapterCreateView, ChapterRetrieveView, ChapterListView, ChapterUpdateView, CharacterCreateView, CharacterUpdateView, CharacterListView, CharactRetrieveView, CharacterDeleteView, ChapterDeleteView, PlaceCreateView, PlaceListView, PlaceRetrieveView, PlaceUpdateView, PlaceDeleteView, CreatureCreateView, CreatureListView, CreatureRetrieveView, CreatureUpdateView, CreatureDeleteView, BookListByAuthorView, BookDeleteView, FavoriteCreateView, FavoriteDeleteView, FavoriteListView, FollowedAuthorCreateView, FollowedAuthorDeleteView, FollowedAuthorListView, healthcheck
 urlpatterns = [
     # PARTIE USER
     path('register/', UserCreateView.as_view(), name='user-register'),
@@ -48,5 +48,8 @@ urlpatterns = [
     # PARTIE AUTEUR SUIVI
     path('newfollowedauthor/', FollowedAuthorCreateView.as_view(), name='followedauthor-create'),
     path('deletefollowedauthor/<str:author_name>/', FollowedAuthorDeleteView.as_view(), name='followedauthor-delete'),
-    path('getallfollowedauthors/<uuid:token>/', FollowedAuthorListView.as_view(), name='followedauthor-getall')
+    path('getallfollowedauthors/<uuid:token>/', FollowedAuthorListView.as_view(), name='followedauthor-getall'),
+
+    # TEST REQUETE DEPLOIEMENT
+    path("healthcheck/", healthcheck, name="healthcheck")
 ]
