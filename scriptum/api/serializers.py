@@ -92,33 +92,43 @@ class BookSerializer(serializers.ModelSerializer):
 
         return book
     
+   
     def update(self, instance, validated_data):
+        print(self.initial_data)
+        print(validated_data)
+        # Créer un dict standard à partir de initial_data
+        data = dict(self.initial_data)  # 🔑 dict Python standard
 
-        # Extraire warnings
-        warnings_data = self.initial_data.get("warnings")
-        if warnings_data:
-            validated_data['warnings'] = json.loads(warnings_data)
+        # Genres
+        genre_names = data.get("genres")
+        if genre_names:
+            if isinstance(genre_names, list):
+                genres_list = genre_names
+            else:
+                # Si FormData, genre_names peut être une string ou QueryDict lists
+                genres_list = self.initial_data.getlist("genres")
+            genres = [Genre.objects.get_or_create(name=name)[0] for name in genres_list]
+            instance.genres.set(genres)
 
+        # Themes
+        theme_names = data.get("themes")
+        if theme_names:
+            if isinstance(theme_names, list):
+                themes_list = theme_names
+            else:
+                themes_list = self.initial_data.getlist("themes")
+            themes = [Theme.objects.get_or_create(name=name)[0] for name in themes_list]
+            instance.themes.set(themes)
 
-        # Mettre à jour les champs simples
+        # Champs simples
+        m2m_fields = ['genres', 'themes']
         for attr, value in validated_data.items():
+            if attr in m2m_fields:
+                continue  # déjà géré avec .set()
             setattr(instance, attr, value)
 
         instance.save()
-
-        # 🔑 Ne mettre à jour que si présent dans la requête
-        if 'genres' in self.initial_data:
-            genre_names = validated_data.get('genres', [])
-            genres = [Genre.objects.get_or_create(name=name)[0] for name in genre_names]
-            instance.genres.set(genres)
-
-        if 'themes' in self.initial_data:
-            theme_names = validated_data.get('themes', [])
-            themes = [Theme.objects.get_or_create(name=name)[0] for name in theme_names]
-            instance.themes.set(themes)
-
         return instance
-
     
 class BookReadSerializer(serializers.ModelSerializer):
     genres = serializers.SlugRelatedField(many=True, read_only=True, slug_field='name')

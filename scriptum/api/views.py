@@ -144,7 +144,10 @@ class BookUpdateView(APIView):
         except Book.DoesNotExist:
             return Response({'error': 'Livre non trouvé'}, status=status.HTTP_404_NOT_FOUND)
         
-        serializer = BookSerializer(book, data=request.data, partial=True)
+         # 🔑 convertir request.data en dict mutable
+        mutable_data = request.data.copy() if hasattr(request.data, 'copy') else dict(request.data)
+        
+        serializer = BookSerializer(book, data=mutable_data, partial=True)
 
         if serializer.is_valid():
             serializer.save()
