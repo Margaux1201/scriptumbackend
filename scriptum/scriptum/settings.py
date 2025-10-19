@@ -75,7 +75,7 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CORS_ALLOW_CREDENTIALS = True
 
-ROOT_URLCONF = 'scriptum.urls'
+ROOT_URLCONF = 'scriptum.scriptum.urls'
 
 TEMPLATES = [
     {
